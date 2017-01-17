@@ -15,4 +15,7 @@ Mutex:
   - Used to protect a shared resource by ensuring mutual exclusion 
   - One key, one bathroom analogy
 
+Critical Section:
+  - A piece of code that should not be concurrently executed
+  - Use Mutex to protect
 
