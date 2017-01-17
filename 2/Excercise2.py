@@ -1,30 +1,30 @@
 from threading import Thread, Lock
+import time
+
+
+i = 0
+mutex = Lock()
 
 def someThreadFunction1():
-    global i, lock
-
-    lock.acquire()
-    try:
-        for x in range (0,1000000):
+    global i, mutex
+    for x in range (0,1000000):
+        mutex.acquire()
+        try:
             i = i + 1
-    finally:
-        lock.release()
+        finally:
+            mutex.release()
 
 def someThreadFunction2():
-    global i,lock
-
-    lock.acquire()
-    try:
-        for x in range (0,1000001):
+    global i, mutex
+    for x in range (0, 1000001):
+        mutex.acquire()
+        try:
             i = i - 1
-    finally:
-        lock.release()
+        finally:
+            mutex.release()
+
 
 def main():
-
-    global i,lock
-    i = 0   
-    lock = Lock()  
 
     someThread1 = Thread(target = someThreadFunction1)
     someThread2 = Thread(target = someThreadFunction2)
@@ -35,7 +35,7 @@ def main():
     someThread1.join()
     someThread2.join()
     
-    print("i: ", i)
+    print(i)
 
 
 main()
