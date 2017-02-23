@@ -86,8 +86,12 @@ procedure ex is
 		exception
 			when Count_Failed =>
 				Put_Line("Error, big error!");
+				Manager.Signal_Abort;
 		end;
 		
+            accept Manager.Finished do
+                
+            end Manager.Finished;
             
             if Manager.Commit = True then
                 Put_Line ("  Worker" & Integer'Image(Initial) & " comitting" & Integer'Image(Num));
