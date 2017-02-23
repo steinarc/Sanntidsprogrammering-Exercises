@@ -17,12 +17,14 @@ procedure ex is
     end Transaction_Manager;
     protected body Transaction_Manager is
         entry Finished when Finished_Gate_Open or Finished'Count = N is
-	x : Integer := 0; -- Dette puttet vi inn for moro skyld
+	participants_waiting : Integer := 0;
         begin
+		Put_Line("Number of workers finished : " & Integer'Image(Finished'Count));
+		-- Hvis aborted er sann, skal alle gå tilbake til forrige verdi og prøve igjen, ellers kan vi slippe gjennom
+
             ------------------------------------------
             -- PART 3: Complete the exit protocol here
-            ------------------------------------------
-		x := 4; -- dette ogsaa
+		
         end Finished;
 
         procedure Signal_Abort is
@@ -48,11 +50,10 @@ procedure ex is
         -------------------------------------------
         -- PART 1: Create the transaction work here
         -------------------------------------------
-        -- number := Random(Gen);
+        
 	number := Random(Gen);
-	--Put_Line("Tallet er" & Float'image(number));
 	if number > Error_Rate then
-		delay Duration(4);
+		delay Duration(3);
 		d := x + 10;
 		
 	else 
@@ -85,25 +86,23 @@ procedure ex is
 			Num := Unreliable_Slow_Add (prev);
 		exception
 			when Count_Failed =>
-				Put_Line("Error, big error!");
+				Put_Line("Counting error for worker " & Integer'Image(initial));
 				Manager.Signal_Abort;
-		end;
-		
-            accept Manager.Finished do
+		end;		
                 
-            end Manager.Finished;
-            
             if Manager.Commit = True then
                 Put_Line ("  Worker" & Integer'Image(Initial) & " comitting" & Integer'Image(Num));
             else
                 Put_Line ("  Worker" & Integer'Image(Initial) &
                              " reverting from" & Integer'Image(Num) &
                              " to" & Integer'Image(Prev));
+		num := prev;
                 -------------------------------------------
                 -- PART 2: Roll back to previous value here
                 -------------------------------------------
             end if;
-
+	    
+	    Manager.Finished;
             Prev := Num;
             delay 0.5;
 
@@ -115,15 +114,10 @@ procedure ex is
      Worker_1 : Transaction_Worker (0, Manager'Access);
      Worker_2 : Transaction_Worker (1, Manager'Access);
      Worker_3 : Transaction_Worker (2, Manager'Access);
-
-	--num : Integer := 12;
-	--Sum :  Integer;
 	
 
 
 begin
-	--Sum := Unreliable_Slow_Add (num);
-	--Put_Line(Integer'Image(Sum));
 
     Reset(Gen); -- Seed the random number generator
 end ex;
