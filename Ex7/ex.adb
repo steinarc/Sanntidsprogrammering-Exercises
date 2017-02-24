@@ -17,14 +17,19 @@ procedure ex is
     end Transaction_Manager;
     protected body Transaction_Manager is
         entry Finished when Finished_Gate_Open or Finished'Count = N is
-	participants_waiting : Integer := 0;
         begin
-		Put_Line("Number of workers finished : " & Integer'Image(Finished'Count));
-		-- Hvis aborted er sann, skal alle gå tilbake til forrige verdi og prøve igjen, ellers kan vi slippe gjennom
-
-            ------------------------------------------
-            -- PART 3: Complete the exit protocol here
-		
+			Put_Line("Number of workers finished : " & Integer'Image(Finished'Count));
+			
+			if Finished'Count = N-1 then
+				Finished_Gate_Open := True;
+				Should_Commit := not Aborted;
+			end if;
+			
+			if Finished'Count = 0 then
+				Finished_Gate_Open := False;
+				Aborted := False;
+			end if;
+        
         end Finished;
 
         procedure Signal_Abort is
@@ -79,16 +84,14 @@ procedure ex is
             Put_Line ("Worker" & Integer'Image(Initial) & " started round" & Integer'Image(Round_Num));
             Round_Num := Round_Num + 1;
 
-            ---------------------------------------
-            -- PART 2: Do the transaction work here             
-            ---------------------------------------
 		begin 
-			Num := Unreliable_Slow_Add (prev);
+			Num := Unreliable_Slow_Add (num);
 		exception
 			when Count_Failed =>
-				Put_Line("Counting error for worker " & Integer'Image(initial));
+				Put_Line("ERROR: counting error for worker " & Integer'Image(initial));
 				Manager.Signal_Abort;
-		end;		
+		end;
+		Manager.Finished;		
                 
             if Manager.Commit = True then
                 Put_Line ("  Worker" & Integer'Image(Initial) & " comitting" & Integer'Image(Num));
@@ -96,13 +99,9 @@ procedure ex is
                 Put_Line ("  Worker" & Integer'Image(Initial) &
                              " reverting from" & Integer'Image(Num) &
                              " to" & Integer'Image(Prev));
-		num := prev;
-                -------------------------------------------
-                -- PART 2: Roll back to previous value here
-                -------------------------------------------
+                num := prev;
             end if;
 	    
-	    Manager.Finished;
             Prev := Num;
             delay 0.5;
 
