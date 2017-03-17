@@ -1,0 +1,16 @@
+Task 1
+1. Fordi noen ting haster mer enn andre
+2. Den må ha en måte å prioritere på. Statisk/dynamisk....
+   Den skal være forutsigbar
+
+Task 2
+1. Prioritetsinversjon: at en tråd med lavere prioritet blokkerer en med høyere. 
+  Ubunden prioritetsinversjon betyr at høyprioritetstråden kan måtte vente til evig tid før den får kjørt.
+2. Nei, ikke nødvendigvis. Om to tråder trenger to ressurser og allokerer den i forskjellig rekkefølge. Da vil ingen av trådene 
+  gi den andre mulighet til å kjøre
+  
+Task 4
+1.  - Bestemt antall oppgaver
+    - Oppgaver er periodiske
+    - Uavhengige
+2. 
